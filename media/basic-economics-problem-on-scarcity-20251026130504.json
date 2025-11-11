@@ -1,0 +1,57 @@
+[
+  {
+    "t_start": 0.0,
+    "t_end": 15.0,
+    "action": "SHOW_LINE",
+    "params": {
+      "line_type": "DEMAND"
+    },
+    "narration": "Every day, we make choices about what we want and how much we're willing to pay. This represents the demand for goods and services."
+  },
+  {
+    "t_start": 15.0,
+    "t_end": 30.0,
+    "action": "SHOW_LINE",
+    "params": {
+      "line_type": "SUPPLY"
+    },
+    "narration": "On the other side, producers decide what to offer and at what price. This is the supply available in the market."
+  },
+  {
+    "t_start": 30.0,
+    "t_end": 45.0,
+    "action": "HIGHLIGHT_EQUILIBRIUM",
+    "params": {},
+    "narration": "Where demand meets supply, we find the market equilibrium \u2013 the price and quantity where buyers and sellers generally agree."
+  },
+  {
+    "t_start": 45.0,
+    "t_end": 65.0,
+    "action": "MOVE_LINE",
+    "params": {
+      "line_type": "SUPPLY",
+      "direction": "LEFT"
+    },
+    "narration": "But what if a resource is limited, or a product becomes incredibly popular? This is where scarcity comes in. Let's imagine a sharp reduction in supply."
+  },
+  {
+    "t_start": 65.0,
+    "t_end": 85.0,
+    "action": "ADD_LABEL",
+    "params": {
+      "label_text": "Shortage",
+      "position": "BELOW_NEW_EQUILIBRIUM"
+    },
+    "narration": "Now, at the original price, demand far exceeds the available supply, creating a significant shortage. Many people want the item, but there isn't enough."
+  },
+  {
+    "t_start": 85.0,
+    "t_end": 110.0,
+    "action": "ADD_LABEL",
+    "params": {
+      "label_text": "Scarcity: Unlimited Wants, Limited Resources",
+      "position": "CENTER"
+    },
+    "narration": "Scarcity is the fundamental economic problem: our wants are virtually unlimited, but the resources and goods available to satisfy them are not. This forces us to make choices and drives prices up in competitive markets."
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "t_start": 0.0,
+    "t_end": 15.0,
+    "action": "SHOW_TEXT",
+    "params": {
+      "text": "Price equilibrium is the point where market supply and demand meet, determining a stable market price and quantity.",
+      "position": "center"
+    },
+    "narration": "Price equilibrium is the point where market supply and demand meet, determining a stable market price and quantity."
+  },
+  {
+    "t_start": 15.0,
+    "t_end": 30.0,
+    "action": "SHOW_LINE",
+    "params": {
+      "name": "SUPPLY"
+    },
+    "narration": "First, we have the supply curve, showing how much producers are willing to sell at various prices."
+  },
+  {
+    "t_start": 30.0,
+    "t_end": 45.0,
+    "action": "SHOW_LINE",
+    "params": {
+      "name": "DEMAND"
+    },
+    "narration": "Then, the demand curve illustrates how much consumers are willing to buy at different price points."
+  },
+  {
+    "t_start": 45.0,
+    "t_end": 60.0,
+    "action": "SHOW_TEXT",
+    "params": {
+      "text": "The intersection of these two curves represents the market's equilibrium point.",
+      "position": "top_left"
+    },
+    "narration": "The intersection of these two curves represents the market's equilibrium point."
+  },
+  {
+    "t_start": 60.0,
+    "t_end": 80.0,
+    "action": "HIGHLIGHT_EQUILIBRIUM",
+    "params": {},
+    "narration": "At this equilibrium, the quantity supplied perfectly matches the quantity demanded, clearing the market."
+  },
+  {
+    "t_start": 80.0,
+    "t_end": 100.0,
+    "action": "SHOW_TEXT",
+    "params": {
+      "text": "This point defines the equilibrium price (P*) and equilibrium quantity (Q*), where market forces are balanced.",
+      "position": "bottom_right"
+    },
+    "narration": "This point defines the equilibrium price (P*) and equilibrium quantity (Q*), where market forces are balanced."
+  }
+]

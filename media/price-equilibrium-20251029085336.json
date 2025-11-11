@@ -1,0 +1,57 @@
+[
+  {
+    "t_start": 0.0,
+    "t_end": 15.0,
+    "action": "SHOW_TEXT",
+    "params": {
+      "text": "Price Equilibrium: Where Supply Meets Demand. Let's start with the supply curve.",
+      "position": "top_left"
+    },
+    "narration": "Price equilibrium is the point where market supply meets demand. Let's start by visualizing the supply curve."
+  },
+  {
+    "t_start": 15.0,
+    "t_end": 25.0,
+    "action": "SHOW_LINE",
+    "params": {
+      "name": "SUPPLY"
+    },
+    "narration": "The supply curve shows how much producers are willing to offer at different prices."
+  },
+  {
+    "t_start": 25.0,
+    "t_end": 40.0,
+    "action": "SHOW_LINE",
+    "params": {
+      "name": "DEMAND"
+    },
+    "narration": "Now, let's add the demand curve, illustrating how much consumers want at various prices."
+  },
+  {
+    "t_start": 40.0,
+    "t_end": 60.0,
+    "action": "HIGHLIGHT_EQUILIBRIUM",
+    "params": {},
+    "narration": "The intersection of these two curves reveals the market's equilibrium price and quantity. This is where the market naturally settles."
+  },
+  {
+    "t_start": 60.0,
+    "t_end": 85.0,
+    "action": "SHOW_TEXT",
+    "params": {
+      "text": "At equilibrium, Quantity Supplied = Quantity Demanded. No surplus, no shortage.",
+      "position": "bottom_left"
+    },
+    "narration": "At this equilibrium point, the quantity supplied exactly matches the quantity demanded. There's no surplus of goods, nor is there a shortage."
+  },
+  {
+    "t_start": 85.0,
+    "t_end": 110.0,
+    "action": "SHOW_TEXT",
+    "params": {
+      "text": "Understanding equilibrium helps predict market behavior and analyze policy impacts.",
+      "position": "center"
+    },
+    "narration": "Understanding price equilibrium is fundamental to economics, helping us predict market behavior and analyze the impact of various policies on prices and quantities."
+  }
+]

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EconViz Local</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>EconViz Local</h1>
+        <p>Prompt Gemini, render in Manim, and download the exact video + code.</p>
+      </header>
+
+      <form id="generate-form">
+        <label for="prompt">Economics prompt</label>
+        <textarea
+          id="prompt"
+          name="prompt"
+          rows="5"
+          required
+        ></textarea>
+
+        <label class="checkbox">
+          <input type="checkbox" id="use_tts" name="use_tts" />
+          Use ElevenLabs TTS (if configured)
+        </label>
+
+        <button type="submit">Generate storyboard & video</button>
+      </form>
+
+      <section id="status" role="status" aria-live="polite"></section>
+
+      <section id="results" hidden>
+        <h2>Outputs</h2>
+        <ul id="download-links"></ul>
+        <details>
+          <summary>Storyboard JSON preview</summary>
+          <pre id="storyboard-json"></pre>
+        </details>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById("generate-form");
+      const statusEl = document.getElementById("status");
+      const resultsEl = document.getElementById("results");
+      const linksEl = document.getElementById("download-links");
+      const storyboardEl = document.getElementById("storyboard-json");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        resultsEl.hidden = true;
+        linksEl.innerHTML = "";
+        storyboardEl.textContent = "";
+        statusEl.textContent = "Generating... this can take up to 90 seconds.";
+
+        const formData = new FormData(form);
+
+        try {
+          const response = await fetch("/generate", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Generation failed");
+          }
+
+          const payload = await response.json();
+          const durationVal = typeof payload.duration === "number" ? payload.duration : 0;
+          statusEl.textContent = `Done in ~${durationVal.toFixed(1)}s`;
+          updateLinks(payload);
+          storyboardEl.textContent = JSON.stringify(payload.storyboard, null, 2);
+          resultsEl.hidden = false;
+        } catch (error) {
+          statusEl.textContent = `⚠️ ${error.message}`;
+        }
+      });
+
+      function updateLinks(data) {
+        linksEl.innerHTML = "";
+        if (data.video_path) {
+          addLink("🎬 Download video", data.video_path);
+        }
+        if (data.code_path) {
+          addLink("📄 Download code (.py)", data.code_path);
+        }
+        if (data.zip_path) {
+          addLink("🗜️ Download bundle (.zip)", data.zip_path);
+        }
+      }
+
+      function addLink(label, href) {
+        const li = document.createElement("li");
+        const anchor = document.createElement("a");
+        anchor.href = href;
+        anchor.textContent = label;
+        anchor.rel = "noopener";
+        anchor.download = "";
+        li.appendChild(anchor);
+        linksEl.appendChild(li);
+      }
+    </script>
+  </body>
+</html>

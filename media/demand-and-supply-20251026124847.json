@@ -1,0 +1,49 @@
+[
+  {
+    "t_start": 0,
+    "t_end": 3,
+    "action": "SHOW_LINE",
+    "params": {
+      "name": "DEMAND"
+    },
+    "narration": "Baseline demand curve appears."
+  },
+  {
+    "t_start": 3,
+    "t_end": 6,
+    "action": "SHOW_LINE",
+    "params": {
+      "name": "SUPPLY"
+    },
+    "narration": "Supply enters to show equilibrium."
+  },
+  {
+    "t_start": 6,
+    "t_end": 10,
+    "action": "HIGHLIGHT_EQUILIBRIUM",
+    "params": {},
+    "narration": "Equilibrium point pulsates."
+  },
+  {
+    "t_start": 10,
+    "t_end": 16,
+    "action": "MOVE_LINE",
+    "params": {
+      "name": "DEMAND",
+      "delta_shift": -1.2,
+      "delta_slope": 0.0
+    },
+    "narration": "Demand shifts left to show a negative shock."
+  },
+  {
+    "t_start": 16,
+    "t_end": 22,
+    "action": "ADD_LABEL",
+    "params": {
+      "x": 3.0,
+      "y": 7.5,
+      "text": "Lower Q, lower P"
+    },
+    "narration": "Annotate the new equilibrium with lower price and quantity."
+  }
+]
