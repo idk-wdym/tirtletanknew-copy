@@ -10,17 +10,15 @@
     <main>
       <header>
         <h1>Code2Video Local</h1>
-        <p>Send any idea to your LLM, get a Manim script, and download the rendered video.</p>
+        <p>
+          Send any idea to your LLM, get a Manim script, and download the
+          rendered video.
+        </p>
       </header>
 
       <form id="generate-form">
         <label for="prompt">Creative brief</label>
-        <textarea
-          id="prompt"
-          name="prompt"
-          rows="5"
-          required
-        ></textarea>
+        <textarea id="prompt" name="prompt" rows="5" required></textarea>
 
         <button type="submit">Generate script & video</button>
       </form>
@@ -65,7 +63,8 @@
           }
 
           const payload = await response.json();
-          const durationVal = typeof payload.duration === "number" ? payload.duration : 0;
+          const durationVal =
+            typeof payload.duration === "number" ? payload.duration : 0;
           statusEl.textContent = `Done in ~${durationVal.toFixed(1)}s`;
           updateLinks(payload);
           codeEl.textContent = payload.source_code || "";

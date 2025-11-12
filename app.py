@@ -62,6 +62,34 @@ def ensure_scene_present(source: str, scene_name: str) -> None:
         )
 
 
+def patch_dash_length_usage(source: str) -> str:
+    if "dash_length" not in source:
+        return source
+    sentinel = "# Code2Video dash_length patch"
+    if sentinel in source:
+        return source
+
+    injection = textwrap.dedent(
+        f"""
+        {sentinel}
+        from manim import Line as _CODE2VIDEO_ORIGINAL_LINE, DashedLine as _CODE2VIDEO_DASHED_LINE
+
+        def Line(*args, dash_length=None, **kwargs):
+            if dash_length is not None:
+                return _CODE2VIDEO_DASHED_LINE(*args, dash_length=dash_length, **kwargs)
+            return _CODE2VIDEO_ORIGINAL_LINE(*args, **kwargs)
+        """
+    ).strip()
+
+    lines = source.splitlines()
+    insert_idx = 0
+    for idx, line in enumerate(lines):
+        if line.lstrip().startswith("from manim import"):
+            insert_idx = idx + 1
+    lines.insert(insert_idx, injection)
+    return "\n".join(lines)
+
+
 def get_scene_name() -> str:
     return os.getenv("VIDEO_SCENE_NAME", "GeneratedScene")
 
@@ -257,6 +285,7 @@ async def generate_endpoint(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    script_source = patch_dash_length_usage(script_source)
     script_path = save_script(script_source, slug)
 
     try:
