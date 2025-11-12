@@ -1,27 +1,27 @@
-# EconViz Local — Plan.md (PRD, v1.1)
+# Code2Video Local — Plan.md (PRD, v1.2)
 
-Minimal local project that turns an economics prompt into a ≤2‑min 1080p30 video via Manim, with Gemini storyboard and optional ElevenLabs TTS — now also emits a self-contained Manim render script you can download and rerun.
+Minimal local project that turns an arbitrary creative brief into a ready-to-run Manim script via an LLM, renders a ≤2‑min 1080p30 video locally, and exposes the script + video for download. The LLM now returns full Python code rather than a constrained economics storyboard, which lets the app cover any subject matter the prompt (and system prompt) specify.
 
 ---
 
 ## 0) One-paragraph summary
 
-Build a tiny, single-user local app that accepts an economics prompt, asks Gemini for a compact, time-coded storyboard (≤6 beats) in a tiny DSL, renders a Manim scene (axes + S/D lines + labels + equilibrium) to 1920×1080@30fps MP4, optionally synthesizes TTS with ElevenLabs, muxes with FFmpeg, and saves both `./media/<slug>.mp4` and `./media/<slug>.json`.  
-New: The app also generates a single-file Manim script (e.g., `./exports/<slug>.py`) that reproduces the exact video from the saved storyboard, plus an optional ZIP bundle for convenience. The HTML page links to the MP4 and the code artifact(s). Everything runs locally on macOS, no DB/Redis/Celery/frameworks.
+Build a tiny, single-user local app that accepts any creative prompt, feeds it (plus a configurable system prompt) to an LLM, captures the returned Python/Manim script, and renders the resulting animation to a local 1080p30 MP4. The script is saved under `./exports/<slug>.py`, zipped for convenience, and the rendered MP4 is stored in `./media/<slug>.mp4` for immediate download via the UI. Everything runs locally on macOS with no external services beyond the chosen LLM.
 
 ---
 
 ## 1) Goals & Non-Negotiables
 
-Primary goal: Local generation of short economics explainer videos with accurate on-screen labeling and coarse A/V sync.
+Primary goal: Local generation of short, high-resolution videos from arbitrary prompts by letting an LLM author full Manim scripts that we execute on-device.
 
-Non-negotiables (unchanged + new):
+Non-negotiables (updated):
 - 1080p30 output, ≤120s.
-- Tools: manim, ffmpeg, uvicorn (local).
-- Tiny project (see §4).
-- Collision-aware labels; S/D; equilibrium with dashed helpers.
-- Save `./media/<slug>.mp4` and `./media/<slug>.json`.
-- New: Also save `./exports/<slug>.py` (self-contained Manim script). Optional `./exports/<slug>.zip` (contains `.py`, `.json`, and a small README snippet). UI exposes download links.
+- Tools: Manim CLI, ffmpeg/ffprobe (for probing only), uvicorn (local only).
+- Save `./media/<slug>.mp4` plus the raw script `./exports/<slug>.py`; ZIP bundle optional but recommended.
+- Never execute scripts that lack the configured Scene name; keep instructions deterministic and side-effect free (no network/file IO beyond Manim basics).
+- UI exposes links to the MP4, script, and ZIP bundle, plus shows the generated code inline.
+
+> Legacy sections below still describe the earlier econ-specific storyboard flow; keep them for historical reference until we fully rewrite the remainder of the doc.
 
 ---
 
@@ -289,4 +289,3 @@ open http://127.0.0.1:8000
   - label placement with anti-overlap nudging,
   - beat player that parses the same DSL.
 - Embeds beats inline (default) for portability; includes a commented option to load JSON if colocated.
-

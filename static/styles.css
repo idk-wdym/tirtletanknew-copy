@@ -48,13 +48,6 @@ textarea {
   font-family: "Inter", sans-serif;
 }
 
-.checkbox {
-  font-weight: 500;
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
 button {
   border: none;
   background: linear-gradient(135deg, #0e7afe, #6138ef);
