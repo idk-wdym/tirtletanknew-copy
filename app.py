@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Tuple
 
+import requests
 from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -110,6 +111,57 @@ def build_system_prompt(scene_name: str) -> str:
         - Do not reference external files, network calls, or environment variables.
         - Feel free to design layouts, timelines, and animations for any topic requested.
         - Comment sparingly to clarify complex animation blocks.
+Generated script must define a Scene subclass named GeneratedScene
+Generated script must define a Scene subclass named GeneratedScene
+Generated script must define a Scene subclass named GeneratedScene
+Generated script must define a Scene subclass named GeneratedScene
+Generated script must define a Scene subclass named GeneratedScene
+        Strict API rules (prevent TypeErrors):
+        - If you need dashed geometry, call DashedLine or Line().set_stroke(dash_array=...). Do NOT pass `dash_length` directly to Line; if you want to hint at dashed behavior, mention the helper.
+        - Use Text or Paragraph for labels. Never pass `wrap_width` to Text/MarkupText; wrap manually before constructing the mobject.
+        - `x_range`/`y_range` only belong on Axes construction or when plotting with axes.plot/axes.get_graph. Do NOT pass them to helper methods like get_horizontal_line, get_vertical_line, Line, or Dot.
+        - Prefer axes.plot over the deprecated axes.get_graph.
+        - Use MathTex sparingly and only when LaTeX is essential.
+        - Provide all required imports explicitly (from manim import ...).
+        - Please avoid x_unit_size and y_unit_size
+    Generate Manim code for the animation that follows these standards:
+    - Use the Manim library to write code that defines each scene, the graphical elements, and their transformations. The overall animation should e xplain and visualize the concepts of the content that the user has inputted, which is at the end of this prompt.
+    - For this video, generate 2-3 examples that comprehensively visualize and explain the concepts which the user wishes to learn.
+    - All of the Manim code has to be in Python with proper syntax with no errors at all.
+    - Do not include Markdown Code Block Syntax, using straight raw code only. Do not include "'''" or "*"'python" in any location.
+    - DO NOT EXPLAIN YOUR CODE GENERATION. STRICTLY PROVIDE CODE AND CODE ONLY.
+    - The class that you use for the Manim generation should STRICTLY be called "RequestGeneration" and nothing else.
+    - You must use latex to write out all text content.
+    5. Optimize the Manim code for accessibility and comprehension:
+    - Refine the code to ensure that it represents the educational content in the most visually engaging and intuitive manner possible.
+    - Keep the target audience in mind and adapt the code to suit the needs of visual learners.
+    - The code must ensure that ALL text content has padding from the borders of the sgreen. Text can be aligned appropriately based on the animatio n, but should never go off screen or be right on the edge of the screen.
+    - The text can use different font sizes, but only if you deem it to be appropriate. For example, you can make the text size for the main concept slightly larger than the text size for the examples. Formatting such as bold, italics, or underline can be used appropriately based on the given c ontent.
+    - You should clear the screen of previous content if you need more space.
+    - The code must make the transition between animations and visual elements as smooth as possible.
+    - The code that adds some color for visual separation to the text and animations that explain the process.
+    - Make sure the colors you apply to the text are legible. Make sure you have good color contrast for text legibility. You have to use all of the colors appropriately and in ways that make the animation and concepts clearer for the user. Follow the standards of the Web Content Accessibility
+    Guidelines (WCAG) 2.
+    6. Output the Manim code:
+    - Return the completed code as an output that meets all the above standards and contains no errors.
+    7. If you run into an error, we will tell you and you will regenerate the code based on that specification.
+    As a reminder, your goal is to enable the efficient creation of high-quality animations that help students, educators, and lifelong learners grasp complex concepts through visually appealing, easy-to-understand representations.
+    If you create a graph of any frame (which is preferred), make sure you CLEAR the frame before and after the render of the entire graph and all its
+    components.
+    Remember, you MUST clear the screen if it is full after ANY generations. Make sure ALL NEW CONTENT IS ON NEW LINES. NO OVERLAPS CAN BE MADE. MAKE S URE THESE VIDEOS ARE SIZABLY LONG AND HAVE GOOD CONTENT.
+    If an equation is especially long, please render it onto multiple lines so that it doesn't go outside of the screen's viewport.
+    Please ensure that there is visual seperation between all text elements.
+    ALWAYS ALWAYS ALWAYSalways names the scene GeneratedScene (case-sensitive
+
+
+
+
+
+
+
+
+
+
         """
     ).strip()
 
@@ -260,15 +312,72 @@ async def download_export(filename: str):
     return FileResponse(file_path, media_type="application/octet-stream", headers=headers)
 
 
+def synthesize_tts(text: str, slug: str) -> Optional[Path]:
+    api_key = os.getenv("ELEVENLABS_API_KEY")
+    if not api_key:
+        return None
+    payload = {
+        "text": text.strip(),
+        "model_id": os.getenv("ELEVENLABS_MODEL", "eleven_multilingual_v2"),
+        "voice_settings": {"stability": 0.5, "similarity_boost": 0.5},
+    }
+    if not payload["text"]:
+        return None
+    voice_id = os.getenv("VOICE_ID", "Rachel")
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+    headers = {"xi-api-key": api_key, "accept": "audio/mpeg"}
+    try:
+        response = requests.post(url, json=payload, headers=headers, timeout=60)
+    except requests.RequestException as exc:  # pragma: no cover - network
+        logger.error("ElevenLabs request error: %s", exc)
+        return None
+    if response.status_code != 200:
+        logger.error("ElevenLabs request failed: %s - %s", response.status_code, response.text)
+        return None
+    audio_path = MEDIA_DIR / f"{slug}.mp3"
+    with audio_path.open("wb") as fh:
+        fh.write(response.content)
+    return audio_path
+
+
+def mux_ffmpeg(video_path: Path, audio_path: Path, slug: str) -> Path:
+    output_path = MEDIA_DIR / f"{slug}_with_audio.mp4"
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(video_path),
+        "-i",
+        str(audio_path),
+        "-c:v",
+        "copy",
+        "-c:a",
+        "aac",
+        "-shortest",
+        str(output_path),
+    ]
+    logger.info("Muxing audio via ffmpeg for %s", slug)
+    try:
+        process = subprocess.run(cmd, capture_output=True, text=True)
+    except FileNotFoundError as exc:
+        raise RuntimeError("FFmpeg not found. Install ffmpeg to enable audio muxing.") from exc
+    if process.returncode != 0:
+        logger.error("FFmpeg mux failed: %s", process.stderr)
+        raise RuntimeError("FFmpeg mux failed.")
+    return output_path
+
+
 @app.post("/generate")
 async def generate_endpoint(
     request: Request,
     prompt: Optional[str] = Form(None),
+    use_tts: bool = Form(False),
 ):
     if prompt is None:
         try:
             payload = await request.json()
             prompt = payload.get("prompt")
+            use_tts = bool(payload.get("use_tts", False))
         except Exception as exc:  # includes JSON decode errors
             raise HTTPException(status_code=400, detail="Invalid payload.") from exc
 
@@ -293,6 +402,24 @@ async def generate_endpoint(
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+    final_video = video_path
+    audio_track = None
+    if use_tts:
+        audio_text = prompt or ""
+        audio_track = synthesize_tts(audio_text, slug)
+        if audio_track:
+            try:
+                silent_video = video_path
+                final_video = mux_ffmpeg(video_path, audio_track, slug)
+                video_path = final_video
+                if silent_video.exists() and silent_video != final_video:
+                    silent_video.unlink(missing_ok=True)
+            except RuntimeError as exc:
+                logger.warning("Falling back to silent video after FFmpeg failure: %s", exc)
+                final_video = video_path
+        else:
+            logger.warning("TTS requested but no audio generated; returning silent video.")
+
     try:
         zip_path = make_export_zip(slug, script_path)
     except Exception as exc:  # pragma: no cover - best effort
@@ -300,11 +427,12 @@ async def generate_endpoint(
         zip_path = None
 
     response = {
-        "video_path": f"/media/{video_path.name}",
+        "video_path": f"/media/{final_video.name}",
         "duration": duration,
         "code_path": f"/exports/{script_path.name}",
         "zip_path": f"/exports/{zip_path.name}" if zip_path else None,
         "source_code": script_source,
+        "audio_path": f"/media/{audio_track.name}" if audio_track else None,
     }
     return response
 

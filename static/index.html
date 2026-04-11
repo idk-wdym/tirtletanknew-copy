@@ -20,6 +20,11 @@
         <label for="prompt">Creative brief</label>
         <textarea id="prompt" name="prompt" rows="5" required></textarea>
 
+        <label class="checkbox">
+          <input type="checkbox" id="use_tts" name="use_tts" />
+          Use ElevenLabs TTS (if configured)
+        </label>
+
         <button type="submit">Generate script & video</button>
       </form>
 
@@ -41,6 +46,7 @@
       const resultsEl = document.getElementById("results");
       const linksEl = document.getElementById("download-links");
       const codeEl = document.getElementById("code-preview");
+      const ttsEl = document.getElementById("use_tts");
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -50,6 +56,7 @@
         statusEl.textContent = "Generating... this can take up to 90 seconds.";
 
         const formData = new FormData(form);
+        formData.set("use_tts", ttsEl.checked ? "true" : "false");
 
         try {
           const response = await fetch("/generate", {
@@ -84,6 +91,9 @@
         }
         if (data.zip_path) {
           addLink("🗜️ Download bundle (.zip)", data.zip_path);
+        }
+        if (data.audio_path) {
+          addLink("🎧 Download audio (.mp3)", data.audio_path);
         }
       }
 
