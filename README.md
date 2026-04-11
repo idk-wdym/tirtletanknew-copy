@@ -2,6 +2,8 @@
 
 **Code2Video** is an AI-powered tool that turns any topic into an animated explainer video. Type in a concept — like "explain the Pythagorean theorem" or "visualize supply and demand" — and it automatically generates a fully rendered 1080p animation with optional voiceover narration. No animation skills required.
 
+![Code2Video UI](UI%20interface.png)
+
 Turn any idea into a rendered Manim animation video — powered by Gemini and optionally narrated by ElevenLabs.
 
 Type a concept (e.g. "explain price equilibrium"), and the app generates a Manim Python script, renders it at 1080p, and lets you download the video. Optionally, it synthesizes a voiceover with ElevenLabs and muxes it in via FFmpeg.
